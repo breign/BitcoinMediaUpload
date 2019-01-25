@@ -5,6 +5,7 @@ process.on('SIGINT', function() {
   const express = require('express')
   const bodyParser = require("body-parser");
   const imageInterface = require('image-data-uri')
+  const datapay = require('datapay')
   const server = express()
   const inDocker = (process.env.DOCKERIZED?true:false)
   const port = (process.env.IN_PORT?process.env.IN_PORT:8080)
@@ -12,7 +13,7 @@ process.on('SIGINT', function() {
   // Your Bitcoin SV Private Key (use a throwaway address for security)
   var privateKey = process.env.BSV_PK;
   
-  if (!privateKey) {
+  if (!privateKey || privateKey.length!=52) {
     console.log('Usage:')
     if (inDocker) {
       console.log('docker run -d \\')
@@ -41,6 +42,12 @@ process.on('SIGINT', function() {
     //@TODO
     //we got url, let's try to check if that really is image, download, validate, transcode and store to blockchain
     //warning, on opened net, someone could forge url.
+    imageInterface.encodeFromURL(request.query.url).then(function(imgres) {
+      console.log(imgres)
+      //make datapay
+
+      response.send('TODO')
+    })
 
   })
   
@@ -51,46 +58,42 @@ process.on('SIGINT', function() {
       response.send('Missing POST data64')
       return
     }
-    //@TODO
-  //  imageInterface.encodeFromFile('./icon.png').then(function(res) {
-      console.log(res)
-      /*
-      datapay.send({
-        data: ["", res]
-      }, function(err, tx) {
-        console.log(err, tx)
-      })
-      */
-  //  })
-    
-    /*
-    const tx = {
-      data: ["0x6d02", request.query.input],
-      pay: { key: privateKey }
-    }
-    var ret = ""
-    datapay.send(tx, function(err, res) {
-      if (err) {
-        console.log("Error:",err)
-        response.send({error:err})
-      }
-      if (res) {
-        console.log("OK:",res)
-        response.send(
-          {
-            error:null,
-            v: 3,
-            q: {
-              find: {tx: {h:res}},
-              limit: 1
-          }
-          })
-  
-      }
-    })
-    */
+    //@TODO decode & save data64 to /tmpm check if is really image...
+    var img = request.body.data64
+    //let buff = Buffer.from(imgres, 'base64');
+//    imageInterface.encodeFromFile('./breign.png').then(function(imgres) {
+      //...it's real image, here are encoded bytes, make datapay
+      console.log(imgres)
+      //we need to make base64 to base58 here
 
-  })
+     // console.log(img)
+      const tx = {
+        data: ["", imgres],
+        pay: { key: privateKey }
+      }
+      datapay.send(tx, function(err, res) {
+        if (err) {
+          console.log("Error:",err)
+          response.send({error:err})
+        }
+        if (res) {
+          console.log("OK:",res)
+          response.send(
+            {
+              error:null,
+              v: 3,
+              q: {
+                find: {tx: {h:res}},
+                limit: 1
+            }
+            })
+    
+        }
+      })
+  
+    })
+
+//  })
   
   server.listen(port, (err) => {
     if (err) {
