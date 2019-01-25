@@ -9,6 +9,7 @@
     "axios": "^0.18.0",
     "bitpipe": "0.0.11",
     "datapay": "0.0.4",
-    "image-data-uri": "^2.0.0"
+    "image-data-uri": "^2.0.0",
+    "express": "^4.16.0"
   }
 }
