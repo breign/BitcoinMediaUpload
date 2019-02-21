@@ -8,7 +8,6 @@
   "dependencies": {
     "axios": "^0.18.0",
     "bitpipe": "0.0.11",
-    "bsv": "0.21.7",
     "datapay": "0.0.7",
     "express": "^4.16.0",
     "image-data-uri": "^2.0.0"

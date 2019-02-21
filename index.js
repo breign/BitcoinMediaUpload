@@ -78,28 +78,27 @@ server.post('/', (request, response) => {
   var img = request.body.data64
   //let buff = Buffer.from(imgres, 'base64');
   //   imageInterface.encodeFromFile('./breign.png').then(function(imgb64) {
-  xdata = fs.readFileSync('~/Downloads/image.jpg') //, {encoding: 'utf-8'}, function(err,xdata){
+  xdata = fs.readFileSync('E:\\Benjo\\Pictures\\my art\\engage.jpg') //, {encoding: 'utf-8'}, function(err,xdata){
   //...it's real image, here are encoded bytes, make datapay
-  //     console.log(xdata)
-  //   let buff = Buffer.from(xdata, 'base64'); 
-  //we need to make base64 to base58 here
 
-  // console.log(img)
   const tx = {
     data: ["19HxigV4QyBv3tHpQVcUEQyq1pzZVdoAut", toArrayBuffer(xdata), 'image/jpeg'],
     pay: {
       key: privateKey,
+      /*      rpc: "https://" + nodeuser + ":" + nodepass + "@bsv.skylab.si" */
     }
   }
   datapay.build(tx, function (err, res) {
     if (err) {
-      console.log("Error:", err)
+      console.log("Error:", err.toString())
       response.send({ error: err })
     } else {
 
       var txid = new Date().toISOString().replace(/\-/g, '').replace(/\:/g, '').replace(/\./g, '');
-      fs.writeFileSync(os.tmpdir()+'/' + txid + '.tx', '{"jsonrpc": "1.0", "id":"' + txid + '", "method": "sendrawtransaction", "params": ["' + res.toString() + '"] }')
+      fs.writeFileSync(os.tmpdir() + '/' + txid + '.tx', '{"jsonrpc": "1.0", "id":"' + txid + '", "method": "sendrawtransaction", "params": ["' + res.toString() + '"] }')
       //we have tx now, let's send it to our node
+      // response.send(res.toString())
+      // process.exit()
 
       http.post({
         url: 'https://bsv.skylab.si/',
@@ -112,7 +111,7 @@ server.post('/', (request, response) => {
             response.send(http_body)
           } else {
             console.log(http_error)
-            response.send(http_error)
+            response.send(http_error, http_response)
           }
         }
 
